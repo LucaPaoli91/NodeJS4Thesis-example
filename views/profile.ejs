@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
     <style>
-        body        { padding-top:80px; word-wrap:break-word; }
+        body{ padding-top:80px; word-wrap:break-word; }
     </style>
 </head>
 <body>
@@ -25,14 +25,35 @@
                 <h3><span class="fa fa-user"></span> Local</h3>
 
                     <p>
+                    	<table>
+                    		<tr>
+	                    		<td>
+	                    			<img src="/uploads/<%= user.personal.profileImageName %>" height="42" width="42">
+	                    		</td>
+	                    		<td>
+	                    			<form id="update_profile_image" action="upload_profile_image/" method="POST" enctype="multipart/form-data">
+	    		                		<strong>Upload new profile image...</strong>
+		        	            		<input type="file" name="profileImage">
+		                    			<input class="btn btn-default btn-sm" type="submit" value="Update Profile Image" form="update_profile_image">
+	                    			</form>
+	                    		</td>
+	                    	<tr>
+                    	</table>
+                    
+                    	<br>
+                    	<br>
+                    	
                         <strong>id</strong>: <%= user._id %><br>
                         <strong>email</strong>: <%= user.local.email %><br>
                         <strong>password</strong>: <%= user.local.password %>
                         
-                        <form action="update_user/" method="POST">
+                        <br>
+                        <br>
+                        
+                        <form id="update_user" action="update_user/" method="POST">
                         	<strong>nickname</strong>
                         	<input type="text" name="new_nickname" value="<%= user.personal.nickname %>">
-                        	<input class="btn btn-default btn-sm" type="submit" value="Update information">
+                        	<input class="btn btn-default btn-sm" type="submit" value="Update information" form="update_user">
                         </form>
                     </p>
 
