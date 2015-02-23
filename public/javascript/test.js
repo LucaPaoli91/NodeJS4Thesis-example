@@ -1,0 +1,7 @@
+/**
+ * 
+ */
+
+function sayHello(){
+	alert("Hello! :)");
+}
