@@ -1,7 +1,11 @@
 // app/routes.js
 
-// load up the user model
-var User = require('../models/user');
+// load up the user model and the Account model
+var User 			= require('../models/user');
+var AccountUser 	= require('../models/userAccount');
+
+// load up library for Promise Pattern
+//var Q				= require('q');
 
 //load up the filesystem module
 var fs = require('fs');
@@ -55,30 +59,35 @@ module.exports = function(app, passport) {
     // we will want this protected so you have to be logged in to visit
     // we will use route middleware to verify this (the isLoggedIn function)
     app.get('/profile', isLoggedIn, function(req, res) {
-    	User.findById(req.user._id, function(err, user){
+    	AccountUser.findOne({'ref.userId' : req.user.local.email}, function(err, account){
     		if(err)
     			throw err;
     		
-    		var data = new Buffer(user.personal.profileImage, 'base64');
+    		var profileImage = account.personal.profileImage;
     		
-    		fs.writeFile('public/uploads/' + user.personal.profileImageName, data);
-    	});
-    	
-        res.render('profile.ejs', {
-            user : req.user // get the user out of session and pass to template
-        });
+    		if(profileImage != '') {
+    			var data = new Buffer(profileImage, 'base64');
+        		
+       			fs.writeFile('public/uploads/' + account.personal.profileImageName, data);				
+			}
+    		
+            res.render('profile.ejs', {
+                user			: req.user, // get the user out of session and pass to template
+                accountUser 	: account // get the user account out of session and pass to template
+            });
+   		});
     });
     
     // =====================================
     // UPDATE USER INFORMATION =============
     // =====================================
     app.post('/update_user', isLoggedIn, function(req, res){
-    	updatePersonalInformation(req.user._id, req.body.new_nickname);
+    	updatePersonalInformation(req.user.local.email, req.body.new_nickname);
     	res.redirect('/profile');
     });
     
     app.post('/upload_profile_image', isLoggedIn, function(req, res){
-    	saveProfileImage(req.user._id, req.files.profileImage);
+    	saveProfileImage(req.user.local.email, req.files.profileImage);
     	res.redirect('/profile');
     });
     
@@ -109,7 +118,7 @@ function isLoggedIn(req, res, next) {
 }
 
 function updatePersonalInformation(id, nickname){
-	User.update({_id : id}, {'personal.nickname' : nickname}, function(err){
+	AccountUser.update({'ref.userId' : id}, {'personal.nickname' : nickname}, function(err){
 		if(err)
 			throw err;
 		else console.info("Entry " + id + " successfully updated!");
@@ -119,9 +128,9 @@ function updatePersonalInformation(id, nickname){
 function saveProfileImage(id, profileImage){
 	fs.readFile(profileImage.path, function(err, data) {
 		var base64ProfileImage = data.toString('base64')
-		var profileImageName = 'PFIMG' + id + '.' + profileImage.extension;
+		var profileImageName = getProfileImageName(id, profileImage);
 		
-		User.update({_id : id}, {'personal.profileImage' : base64ProfileImage, 'personal.profileImageName' : profileImageName}, function(err){
+		AccountUser.update({'ref.userId' : id}, {'personal.profileImage' : base64ProfileImage, 'personal.profileImageName' : profileImageName}, function(err){
 			if(err)
 				throw err;
 			else console.info("Profile image " + profileImageName + " for " + id + " successfully updated!");
@@ -130,4 +139,8 @@ function saveProfileImage(id, profileImage){
 		//delete image from temporary upload folder
 		fs.unlink(profileImage.path);
 	});
+}
+
+function getProfileImageName(id, profileImage){
+	return 'PFIMG' + id + '.' + profileImage.extension;
 }

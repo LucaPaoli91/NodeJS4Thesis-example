@@ -27,13 +27,7 @@ var userSchema = mongoose.Schema({
         token 		     : String,
         email        	 : String,
         name       		 : String
-    },
-    personal		 	 : {
-    	profileImage 	 : String,
-    	profileImageName : String,
-    	nickname	 	 : String
     }
-
 });
 
 // methods ======================

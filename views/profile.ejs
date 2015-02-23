@@ -28,7 +28,7 @@
                     	<table>
                     		<tr>
 	                    		<td>
-	                    			<img src="/uploads/<%= user.personal.profileImageName %>" height="42" width="42">
+	                    			<img src="/uploads/<%= accountUser.personal.profileImageName %>" height="42" width="42">
 	                    		</td>
 	                    		<td>
 	                    			<form id="update_profile_image" action="upload_profile_image/" method="POST" enctype="multipart/form-data">
@@ -50,14 +50,9 @@
                         <br>
                         <br>
                         
-                        <input type="button" onclick="sayHello()" value="Say Hello!">
-                        
-                        <br>
-                        <br>
-                        
                         <form id="update_user" action="update_user/" method="POST">
                         	<strong>nickname</strong>
-                        	<input type="text" name="new_nickname" value="<%= user.personal.nickname %>">
+                        	<input type="text" name="new_nickname" value="<%= accountUser.personal.nickname %>">
                         	<input class="btn btn-default btn-sm" type="submit" value="Update information" form="update_user">
                         </form>
                     </p>
