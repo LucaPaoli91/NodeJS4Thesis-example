@@ -100,7 +100,8 @@ module.exports = function(app, passport) {
     // =====================================
     // LOGOUT ==============================
     // =====================================
-    app.get('/logout', function(req, res) {
+    app.get('/logout', isLoggedIn, function(req, res) {
+    	deleteProfileImage(req.user.local.email);
         req.logout();
         res.redirect('/');
     });
@@ -130,6 +131,8 @@ function saveProfileImage(id, profileImage){
 		var base64ProfileImage = data.toString('base64')
 		var profileImageName = getProfileImageName(id, profileImage);
 		
+		deleteProfileImage(id);
+		
 		AccountUser.update({'ref.userId' : id}, {'personal.profileImage' : base64ProfileImage, 'personal.profileImageName' : profileImageName}, function(err){
 			if(err)
 				throw err;
@@ -143,4 +146,13 @@ function saveProfileImage(id, profileImage){
 
 function getProfileImageName(id, profileImage){
 	return 'PFIMG' + id + '.' + profileImage.extension;
+}
+
+function deleteProfileImage(id){
+	AccountUser.findOne({'ref.userId' : id}, function(err, account){
+		if(err)
+			throw err;
+		
+		fs.unlink('./public/uploads/' + account.personal.profileImageName);
+	});
 }
